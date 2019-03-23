@@ -1,0 +1,11 @@
+import http.server
+import socketserver
+
+PORT = 20100
+
+Handler = http.server.ThreadingHTTPServer
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
+Server closed connection without sending any data back at /usr/share/perl5/Net/HTTP/Methods.pm line 391.
