@@ -1,21 +1,35 @@
-#!/usr/bin/env python
+import socketserver
+from http.server import SimpleHTTPRequestHandler
+from urllib.request import urlopen
 
-from http.server import ThreadingHTTPServer, HTTPServer
+PORT = 20100
 
-# HTTPRequestHandler class
-
-class testHTTPServer_RequestHandler(ThreadingHTTPServer):
-
-    # GET
+class Proxy(SimpleHTTPRequestHandler):
     def do_GET(self):
-        # Send response status code
-        pass
+        print(">> PROXY_SERVER : ", self.client_address)
+        
+        client_addr = self.client_address
+        # client_addr is a tuple consisting of the ip address and socket number
+        # of the client. Using this, write a condition for allowing requests only
+        # from appropriate socket numbers
+        
+        self.copyfile(urlopen(self.path), self.wfile)
+        print("SUCCESS")
 
-def run():
-    print('starting server...')
-    server_address = ('127.0.0.1', 20100)
-    httpd = ThreadingHTTPServer(server_address, testHTTPServer_RequestHandler)
-    print('running server...')
-    httpd.serve_forever()
+if __name__ == "__main__":
+    try:
+        print(">> PROXY_SERVER : Proxy server running")
+        httpd = socketserver.ThreadingTCPServer(('', PORT), Proxy)
+        print(">> PROXY_SERVER : Serving at port", PORT)
+        httpd.serve_forever()
 
-run()
+    except KeyboardInterrupt:
+        print("\n>> PROXY_SERVER : __SIGINT__ detected")
+        print(">> PROXY_SERVER : << Shutting down >>")
+        httpd.shutdown()
+
+    except Exception as _exc:
+        print("\n>> PROXY_SERVER : _Exception_\n",_exc)
+        print(">> PROXY_SERVER : << Shutting down >>")
+        httpd.shutdown()
+
