@@ -9,14 +9,14 @@ class Proxy(SimpleHTTPRequestHandler):
     def do_GET(self):
         client_addr = self.client_address
         print(">> PROXY_SERVER : ", client_addr)
-        print(" PROXY_SERVER : Handling Client ", str(self.client_address))
+        print(" PROXY_SERVER : GET : Handling Client ", str(self.client_address))
         
         # client_addr is a tuple consisting of the ip address and socket number
         # of the client. Using this, write a condition for allowing requests only
         # from appropriate socket numbers
-        request_data = self.request.recv(1024).strip()
 
-        
+        # request_data = self.request.recv(1024).strip()
+        # print(request_data)
         self.copyfile(urlopen(self.path), self.wfile)
         print("SUCCESS")
 
@@ -46,8 +46,16 @@ if __name__ == "__main__":
         try:
             while True:
                 sleep(1)
-        except:
-            pass
+
+        except KeyboardInterrupt:
+            print("\n>> PROXY_SERVER : __SIGINT__ detected")
+            print(">> PROXY_SERVER : << Shutting down >>")
+            httpd.shutdown()
+
+        except Exception as _exc:
+            print("\n>> PROXY_SERVER : _Exception_\n", _exc)
+            print(">> PROXY_SERVER : << Shutting down >>")
+            httpd.shutdown()
 
     except KeyboardInterrupt:
         print("\n>> PROXY_SERVER : __SIGINT__ detected")
