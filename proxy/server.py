@@ -41,6 +41,8 @@ class Proxy(SimpleHTTPRequestHandler):
                print(">> PROXY_SERVER : Invalid request")
                exit()
 
+            #Write the caching after this
+
             self.copyfile(urlopen(self.path), self.wfile)
             print(">> PROXY_SERVER : SUCCESS")
 
