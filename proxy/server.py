@@ -1,3 +1,4 @@
+import base64
 import socketserver, threading
 from urllib.request import urlopen
 from http.server import SimpleHTTPRequestHandler
@@ -14,6 +15,16 @@ for line in fd.readlines():
 
     blacklist.append(temp)
 
+fd1 = open('auth.txt')
+authlist = []
+
+for line in fd1.readlines():
+    t = line.strip('\n')
+    temp = base64.b64encode(t.encode('utf-8')).decode('utf-8')
+    authlist.append(temp)
+
+print(authlist)
+
 class Proxy(SimpleHTTPRequestHandler):
     # Get request handler (add caching code in this function)
     def do_GET(self):
@@ -29,17 +40,23 @@ class Proxy(SimpleHTTPRequestHandler):
             print(dest_ip)
 
             print(self.requestline) # ignore
+            details = dict(self.headers) # ignore
+            print(details)
+
+            _auth = "XXXXXXXXX"
+            if 'Proxy-Authorization' in details.keys():
+                _auth = details['Proxy-Authorization'].strip().split(' ')[1]
+                print(_auth)
 
             if int(dest_ip[1]) not in range(20000,20201):
                 print(">> PROXY_SERVER : Invalid request")
                 threading.current_thread().join
                 exit()
 
-
             if dest_ip in blacklist:
-                # if no auth:
-               print(">> PROXY_SERVER : Invalid request")
-               exit()
+                if _auth not in authlist:
+                    print(">> PROXY_SERVER : Invalid request")
+                    exit()
 
             #Write the caching after this
 
@@ -50,14 +67,39 @@ class Proxy(SimpleHTTPRequestHandler):
             #    print(">> PROXY_SERVER : Invalid request")
             #    exit()
 
-        except:
+        except Exception as e:
+            print(e)
             threading.current_thread().join
             exit()
 
     def do_POST(self):
-        client_addr = self.client_address
-        print(">> PROXY_SERVER : ", client_addr)
-        print(" PROXY_SERVER : Handling Client ", str(self.client_address))
+         print(">> PROXY_SERVER : ", client_addr)
+         print(">> PROXY_SERVER : GET : Handling Client ",
+               str(self.client_address))
+         print(">> PROXY_SERVER : Thread Name:{}".format(
+             threading.current_thread().name))
+
+         dest_ip = self.path.strip("http://").split(':')
+         print(dest_ip)
+
+         print(self.requestline)  # ignore
+         details = dict(self.headers)  # ignore
+         print(details)
+
+          _auth = "XXXXXXXXX"
+           if 'Proxy-Authorization' in details.keys():
+                _auth = details['Proxy-Authorization'].strip().split(' ')[1]
+                print(_auth)
+
+            if int(dest_ip[1]) not in range(20000, 20201):
+                print(">> PROXY_SERVER : Invalid request")
+                threading.current_thread().join
+                exit()
+
+            if dest_ip in blacklist:
+                if _auth not in authlist:
+                    print(">> PROXY_SERVER : Invalid request")
+                    exit()
 
         self.copyfile(urlopen(self.path), self.wfile)
         print("SUCCESS")
@@ -82,5 +124,4 @@ if __name__ == "__main__":
         print(">> PROXY_SERVER : << Shutting down >>")
         httpd.shutdown()
         exit()
-
 
