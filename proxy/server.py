@@ -73,18 +73,18 @@ class Proxy(SimpleHTTPRequestHandler):
             exit()
 
     def do_POST(self):
-         print(">> PROXY_SERVER : ", client_addr)
-         print(">> PROXY_SERVER : GET : Handling Client ",
-               str(self.client_address))
-         print(">> PROXY_SERVER : Thread Name:{}".format(
-             threading.current_thread().name))
+        print(">> PROXY_SERVER : ", client_addr)
+        print(">> PROXY_SERVER : GET : Handling Client ",
+            str(self.client_address))
+        print(">> PROXY_SERVER : Thread Name:{}".format(
+            threading.current_thread().name))
 
-         dest_ip = self.path.strip("http://").split(':')
-         print(dest_ip)
+        dest_ip = self.path.strip("http://").split(':')
+        print(dest_ip)
 
-         print(self.requestline)  # ignore
-         details = dict(self.headers)  # ignore
-         print(details)
+        print(self.requestline)  # ignore
+        details = dict(self.headers)  # ignore
+        print(details)
 
         _auth = "XXXXXXXXX"
         if 'Proxy-Authorization' in details.keys():
