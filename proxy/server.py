@@ -23,25 +23,23 @@ for line in fd1.readlines():
     temp = base64.b64encode(t.encode('utf-8')).decode('utf-8')
     authlist.append(temp)
 
-print(authlist)
-
 class Proxy(SimpleHTTPRequestHandler):
     # Get request handler (add caching code in this function)
     def do_GET(self):
         try:
             client_addr = self.client_address
 
-            # if client_addr[2] in range(20000, 20100):
+            if client_addr[1] not in range(20000, 20100):
+                print(">> PROXY_SERVER : Invalid request")
+                threading.current_thread().join
+                exit()
+
             print(">> PROXY_SERVER : ", client_addr)
             print(">> PROXY_SERVER : GET : Handling Client ", str(self.client_address))
             print(">> PROXY_SERVER : Thread Name:{}".format(threading.current_thread().name))
 
             dest_ip = self.path.strip("http://").split(':')
-            print(dest_ip)
-
-            print(self.requestline) # ignore
-            details = dict(self.headers) # ignore
-            print(details)
+            details = dict(self.headers)
 
             _auth = "XXXXXXXXX"
             if 'Proxy-Authorization' in details.keys():
@@ -63,16 +61,19 @@ class Proxy(SimpleHTTPRequestHandler):
             self.copyfile(urlopen(self.path), self.wfile)
             print(">> PROXY_SERVER : SUCCESS")
 
-            # else:
-            #    print(">> PROXY_SERVER : Invalid request")
-            #    exit()
-
         except Exception as e:
             print(e)
             threading.current_thread().join
             exit()
 
     def do_POST(self):
+        client_addr = self.client_address
+
+        if client_addr[1] not in range(20000, 20100):
+            print(">> PROXY_SERVER : Invalid request")
+            threading.current_thread().join
+            exit()
+
         print(">> PROXY_SERVER : GET : Handling Client ",
             str(self.client_address))
         print(">> PROXY_SERVER : Thread Name:{}".format(
@@ -101,7 +102,7 @@ class Proxy(SimpleHTTPRequestHandler):
                 exit()
 
         self.copyfile(urlopen(self.path), self.wfile)
-        print("SUCCESS")
+        print("PROXY_SERVER : SUCCESS")
 
 
 if __name__ == "__main__":
