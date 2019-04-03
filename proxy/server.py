@@ -73,7 +73,6 @@ class Proxy(SimpleHTTPRequestHandler):
             exit()
 
     def do_POST(self):
-        print(">> PROXY_SERVER : ", client_addr)
         print(">> PROXY_SERVER : GET : Handling Client ",
             str(self.client_address))
         print(">> PROXY_SERVER : Thread Name:{}".format(
