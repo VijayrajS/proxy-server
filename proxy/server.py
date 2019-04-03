@@ -86,20 +86,20 @@ class Proxy(SimpleHTTPRequestHandler):
          details = dict(self.headers)  # ignore
          print(details)
 
-          _auth = "XXXXXXXXX"
-           if 'Proxy-Authorization' in details.keys():
-                _auth = details['Proxy-Authorization'].strip().split(' ')[1]
-                print(_auth)
+        _auth = "XXXXXXXXX"
+        if 'Proxy-Authorization' in details.keys():
+            _auth = details['Proxy-Authorization'].strip().split(' ')[1]
+            print(_auth)
 
-            if int(dest_ip[1]) not in range(20000, 20201):
+        if int(dest_ip[1]) not in range(20000, 20201):
+            print(">> PROXY_SERVER : Invalid request")
+            threading.current_thread().join
+            exit()
+
+        if dest_ip in blacklist:
+            if _auth not in authlist:
                 print(">> PROXY_SERVER : Invalid request")
-                threading.current_thread().join
                 exit()
-
-            if dest_ip in blacklist:
-                if _auth not in authlist:
-                    print(">> PROXY_SERVER : Invalid request")
-                    exit()
 
         self.copyfile(urlopen(self.path), self.wfile)
         print("SUCCESS")
